@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.figma.com)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\heewon\\\\storyspanner-web\\\\components\\\\ui\")",
+      "PowerShell(cd \"c:\\\\Users\\\\heewon\\\\storyspanner-web\"; npx tsc --noEmit --skipLibCheck 2>&1 | Where-Object { $_ -notmatch '\\\\.next' } | Select-Object -First 30)"
+    ]
+  }
+}

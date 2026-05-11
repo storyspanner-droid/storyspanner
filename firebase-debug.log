@@ -1,0 +1,55 @@
+[debug] [2026-05-06T02:28:20.769Z] ----------------------------------------------------------------------
+[debug] [2026-05-06T02:28:20.772Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\heewon\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init hosting --debug
+[debug] [2026-05-06T02:28:20.773Z] CLI Version:   15.16.0
+[debug] [2026-05-06T02:28:20.773Z] Platform:      win32
+[debug] [2026-05-06T02:28:20.773Z] Node Version:  v24.15.0
+[debug] [2026-05-06T02:28:20.773Z] Time:          Wed May 06 2026 11:28:20 GMT+0900 (한국 표준시)
+[debug] [2026-05-06T02:28:20.773Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\heewon\storyspanner-web
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2026-05-06T02:29:11.279Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-05-06T02:29:11.280Z] > authorizing via signed-in user (storyspanner@gmail.com)
+[debug] [2026-05-06T02:29:11.282Z] Checked if tokens are valid: true, expires at: 1778037748048
+[debug] [2026-05-06T02:29:11.314Z] Checked if tokens are valid: true, expires at: 1778037748048
+[debug] [2026-05-06T02:29:11.320Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/story-spanner [none]
+[debug] [2026-05-06T02:29:11.804Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/story-spanner 200
+[debug] [2026-05-06T02:29:11.804Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/story-spanner {"projectId":"story-spanner","projectNumber":"1079701412120","displayName":"story-spanner","name":"projects/story-spanner","resources":{"hostingSite":"story-spanner","realtimeDatabaseInstance":"story-spanner-default-rtdb"},"state":"ACTIVE","etag":"1_c80f5c8c-6236-43fa-82d8-e0656827a144"}
+[info] i  Using project story-spanner (story-spanner) . 
+[info] 
+=== Hosting Setup
+[info] 
+[debug] [2026-05-06T02:29:36.203Z] Checked if tokens are valid: true, expires at: 1778037748048
+[debug] [2026-05-06T02:29:36.205Z] Checked if tokens are valid: true, expires at: 1778037748048
+[debug] [2026-05-06T02:29:36.210Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/story-spanner [none]
+[debug] [2026-05-06T02:29:36.635Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/story-spanner 200
+[debug] [2026-05-06T02:29:36.637Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/story-spanner {"projectId":"story-spanner","projectNumber":"1079701412120","displayName":"story-spanner","name":"projects/story-spanner","resources":{"hostingSite":"story-spanner","realtimeDatabaseInstance":"story-spanner-default-rtdb"},"state":"ACTIVE","etag":"1_c80f5c8c-6236-43fa-82d8-e0656827a144"}
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 
+[info] +  Wrote out\404.html 
+[debug] [2026-05-06T02:30:05.303Z] >>> [apiv2][query] GET https://www.gstatic.com/firebasejs/releases.json [none]
+[debug] [2026-05-06T02:30:05.487Z] <<< [apiv2][status] GET https://www.gstatic.com/firebasejs/releases.json 200
+[debug] [2026-05-06T02:30:05.494Z] <<< [apiv2][body] GET https://www.gstatic.com/firebasejs/releases.json {"current":{"version":"12.12.1","browserURL":"https://www.gstatic.com/firebasejs/12.12.1/firebase.js","packageURL":"https://www.gstatic.com/firebasejs/12.12.1/firebase.tgz"},"live":{"version":"12.12","browserURL":"https://www.gstatic.com/firebasejs/live/12.12/firebase.js","packageURL":"https://www.gstatic.com/firebasejs/live/12.12/firebase.tgz"},"components":{"ai":"https://www.gstatic.com/firebasejs/12.12.1/firebase-ai.js","analytics":"https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js","app":"https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js","app-check":"https://www.gstatic.com/firebasejs/12.12.1/firebase-app-check.js","auth":"https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js","auth/cordova":"https://www.gstatic.com/firebasejs/12.12.1/firebase-auth/cordova.js","auth/web-extension":"https://www.gstatic.com/firebasejs/12.12.1/firebase-auth/web-extension.js","functions":"https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js","firestore":"https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js","firestore/lite":"https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore/lite.js","firestore/pipelines":"https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore/pipelines.js","firestore/lite/pipelines":"https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore/lite/pipelines.js","installations":"https://www.gstatic.com/firebasejs/12.12.1/firebase-installations.js","storage":"https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js","performance":"https://www.gstatic.com/firebasejs/12.12.1/firebase-performance.js","remote-config":"https://www.gstatic.com/firebasejs/12.12.1/firebase-remote-config.js","messaging":"https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js","messaging/sw":"https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging/sw.js","database":"https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js","data-connect":"https://www.gstatic.com/firebasejs/12.12.1/firebase-data-connect.js","firestore.memory":"https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.memory.js"}}
+[info] +  Wrote out\index.html 
+[info] 
+=== Agent Skills Setup
+[info] If you are using an AI coding agent, Firebase Agent Skills make it an expert at Firebase.
+[info] 
