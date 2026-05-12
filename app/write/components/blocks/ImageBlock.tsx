@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { ImageEditorBlock, ImageLayout, ImageTextAlign } from '../../types';
 
 interface Props {
@@ -38,6 +39,7 @@ function UploadSlot({ url, blockId, onUpload, label }: { url: string; blockId: s
 
 export default function ImageBlock({ block, onChange, onRemove, onUpload, onUpload2, onMerge }: Props) {
   const isGrid = block.layout === 'grid-2';
+  const [isDragTarget, setIsDragTarget] = useState(false);
 
   const containerStyle: React.CSSProperties = isGrid
     ? { width: '100%' }
@@ -48,11 +50,17 @@ export default function ImageBlock({ block, onChange, onRemove, onUpload, onUplo
       };
 
   const handleDragOver = (e: React.DragEvent) => {
-    if (e.dataTransfer.types.includes('text/x-image-block-id')) e.preventDefault();
+    if (e.dataTransfer.types.includes('text/x-image-block-id')) {
+      e.preventDefault();
+      setIsDragTarget(true);
+    }
   };
+
+  const handleDragLeave = () => setIsDragTarget(false);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragTarget(false);
     const sourceId = e.dataTransfer.getData('text/x-image-block-id');
     if (sourceId && sourceId !== block.id && onMerge) {
       onMerge(sourceId, block.id);
@@ -61,12 +69,14 @@ export default function ImageBlock({ block, onChange, onRemove, onUpload, onUplo
 
   return (
     <div
-      className="relative group"
+      className={`relative group ${isDragTarget ? 'ring-2 ring-[#6C3FC5] ring-inset rounded-[8px]' : ''}`}
       draggable={!!block.url}
       onDragStart={(e) => { e.stopPropagation(); e.dataTransfer.setData('text/x-image-block-id', block.id); }}
       onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
+      {isDragTarget && <div className="absolute -right-[2px] top-0 bottom-0 w-[3px] bg-[#6C3FC5] rounded-full z-30 pointer-events-none" />}
       <button type="button" onClick={() => onRemove(block.id)}
         className="absolute top-1 right-1 z-10 w-6 h-6 bg-black/50 text-white text-[11px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">✕</button>
 
@@ -99,7 +109,7 @@ export default function ImageBlock({ block, onChange, onRemove, onUpload, onUplo
           </div>
         ) : (
           block.url ? (
-            <img src={block.url} alt={block.caption} className="w-full rounded-[8px] block" />
+            <img src={block.url} alt={block.caption} className="rounded-[8px] block" style={{ width: '100%', maxWidth: '600px', height: 'auto' }} />
           ) : (
             <label className="block w-full min-h-[120px] border-2 border-dashed border-[#D1D5DB] rounded-[8px] flex items-center justify-center cursor-pointer hover:border-[#6C3FC5] transition-colors">
               <span className="text-[13px] text-[#9CA3AF]">🖼 이미지를 클릭하여 업로드</span>

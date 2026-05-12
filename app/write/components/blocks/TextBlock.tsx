@@ -56,25 +56,9 @@ export default function TextBlock({ block, onChange, registerRef, placeholder = 
     onChange(block.id, ref.current.innerHTML);
   };
 
-  const setH3 = () => {
-    if (!ref.current) return;
-    ref.current.innerHTML = '<h3><br></h3>';
-    const h = ref.current.querySelector('h3');
-    if (h) {
-      const r = document.createRange();
-      r.setStart(h, 0);
-      r.collapse(true);
-      window.getSelection()?.removeAllRanges();
-      window.getSelection()?.addRange(r);
-    }
-    ref.current.focus();
-    onChange(block.id, ref.current.innerHTML);
-  };
-
   const slashItems: SlashItem[] = [
     { icon: '📝', label: '텍스트', desc: '일반 텍스트 블록', action: () => ref.current?.focus() },
     { icon: 'H2', label: '소제목', desc: '목차에 자동 등록', isH: true, action: setH2 },
-    { icon: 'H3', label: '소소제목', desc: '소제목의 하위 제목', isH: true, action: setH3 },
     { icon: '🖼️', label: '이미지', desc: '이미지 업로드', action: () => onAddBlockAfter?.('image') },
     { icon: '💡', label: '콜아웃', desc: '강조 박스', action: () => onAddBlockAfter?.('callout') },
     { icon: '📊', label: '표', desc: '데이터 표', action: () => onAddBlockAfter?.('table') },
@@ -99,6 +83,29 @@ export default function TextBlock({ block, onChange, registerRef, placeholder = 
       if (e.key === 'ArrowUp') { e.preventDefault(); setSlashIdx((i) => (i - 1 + slashItems.length) % slashItems.length); return; }
       if (e.key === 'Enter') { e.preventDefault(); execSlash(slashIdx); return; }
       if (e.key === 'Escape' || e.key === 'Backspace') { setShowSlash(false); return; }
+    }
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const sel = window.getSelection();
+      if (sel) {
+        const anchorNode = sel.anchorNode;
+        const el = anchorNode
+          ? (anchorNode.nodeType === Node.TEXT_NODE ? anchorNode.parentElement : anchorNode as Element)
+          : null;
+        const h2 = el?.closest('h2') as HTMLHeadingElement | null;
+        if (h2) {
+          e.preventDefault();
+          const p = document.createElement('p');
+          p.innerHTML = '<br>';
+          h2.after(p);
+          const range = document.createRange();
+          range.setStart(p, 0);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+          if (ref.current) onChange(block.id, ref.current.innerHTML);
+          return;
+        }
+      }
     }
     if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
       if ((ref.current?.textContent ?? '').trim() === '') {

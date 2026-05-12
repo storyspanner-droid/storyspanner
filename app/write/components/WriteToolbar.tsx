@@ -13,7 +13,7 @@ interface Props {
   onLink: () => void; onCode: () => void; onImage: () => void;
   onYouTube: () => void; onFocusMode: () => void; onSpellCheck: () => void;
   onSplitView: () => void; onDraftList: () => void;
-  onHeading2: () => void; onHeading3: () => void;
+  onHeading2: () => void;
   onBlockquote: () => void; onDivider: () => void;
   isFocusMode?: boolean; spellCheckEnabled?: boolean; isSplitView?: boolean;
   onSaveSelection?: () => void;
@@ -24,7 +24,7 @@ export default function WriteToolbar({
   onFontSize, onFontFamily, onFontColor, onFontBgColor,
   onAlignLeft, onAlignCenter, onAlignRight,
   onLink, onCode, onImage, onYouTube, onFocusMode, onSpellCheck, onSplitView, onDraftList,
-  onHeading2, onHeading3, onBlockquote, onDivider,
+  onHeading2, onBlockquote, onDivider,
   isFocusMode, spellCheckEnabled, isSplitView, onSaveSelection,
 }: Props) {
   const [picker, setPicker] = useState<PickerType>('none');
@@ -93,7 +93,6 @@ export default function WriteToolbar({
       <Btn tooltip="저장 목록" onClick={onDraftList}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></Btn>
       <Sep />
       <Btn tooltip="소제목 H2 (목차 자동 등록)" onClick={onHeading2}><span className="text-[12px] font-black text-[#6C3FC5]">H2</span></Btn>
-      <Btn tooltip="소소제목 H3" onClick={onHeading3}><span className="text-[12px] font-bold text-[#8B5CF6]">H3</span></Btn>
       <Btn tooltip="인용구" onClick={onBlockquote}><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg></Btn>
       <Btn tooltip="구분선" onClick={onDivider}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="12" x2="21" y2="12"/></svg></Btn>
     </div>

@@ -38,7 +38,6 @@ export interface WriteEditorAPI {
   focusBlock: (id: string) => void;
   // ── 블록 서식 ──
   execHeading2: () => void;
-  execHeading3: () => void;
   execBlockquote: () => void;
   execDivider: () => void;
   // ── 목차 ──
@@ -54,6 +53,8 @@ export interface WriteEditorAPI {
   // ── 컬럼/스텝 업로드 ──
   handleColumnsBlockUpload: (blockId: string, cellId: string, file: File) => void;
   handleStepsBlockUpload: (blockId: string, stepId: string, slot: 1 | 2, file: File) => void;
+  // ── 에디터 드래그 드롭 이미지 ──
+  handleImageDropOnEditor: (file: File, afterBlockId: string) => void;
 }
 
 export function useWriteEditor(
@@ -177,6 +178,16 @@ export function useWriteEditor(
     finally { onImageUploading(false); }
   }, [blocksAPI, onImageUploading]);
 
+  const handleImageDropOnEditor = useCallback(async (file: File, afterBlockId: string) => {
+    onImageUploading(true);
+    try {
+      const newId = blocksAPI.addBlockAfter(afterBlockId, 'image');
+      const url = await uploadImage(file, 'content');
+      blocksAPI.updateBlock(newId, { url });
+    } catch { /* ignore */ }
+    finally { onImageUploading(false); }
+  }, [blocksAPI, onImageUploading]);
+
   const updateCharCount = useCallback(() => {
     const text = blocksAPI.getTextContent();
     setCharCount({ total: text.length, noSpace: text.replace(/\s/g, '').length });
@@ -189,9 +200,9 @@ export function useWriteEditor(
 
   const extractH2Items = useCallback((): { id: string; text: string }[] => {
     const items: { id: string; text: string }[] = [];
-    editorContainerRef.current?.querySelectorAll('h2').forEach((el, i) => {
+    editorContainerRef.current?.querySelectorAll('h2').forEach((el) => {
       const htmlEl = el as HTMLElement;
-      if (!htmlEl.id) htmlEl.id = 'h2-' + i + '-' + Date.now();
+      if (!htmlEl.id) htmlEl.id = 'h2-' + Date.now() + Math.random().toString(36).slice(2);
       const text = el.textContent?.trim();
       if (text) items.push({ id: htmlEl.id, text });
     });
@@ -201,17 +212,13 @@ export function useWriteEditor(
   const execHeading2 = useCallback(() => {
     document.execCommand('formatBlock', false, 'h2');
     setTimeout(() => {
-      editorContainerRef.current?.querySelectorAll('h2').forEach((el, i) => {
+      editorContainerRef.current?.querySelectorAll('h2').forEach((el) => {
         const htmlEl = el as HTMLElement;
-        if (!htmlEl.id) htmlEl.id = 'h2-' + i + '-' + Date.now();
+        if (!htmlEl.id) htmlEl.id = 'h2-' + Date.now() + Math.random().toString(36).slice(2);
       });
       onTocUpdate?.(extractH2Items());
     }, 0);
   }, [extractH2Items, onTocUpdate]);
-
-  const execHeading3 = useCallback(() => {
-    document.execCommand('formatBlock', false, 'h3');
-  }, []);
 
   const execBlockquote = useCallback(() => {
     document.execCommand('formatBlock', false, 'blockquote');
@@ -287,7 +294,6 @@ export function useWriteEditor(
     escapeBlock: blocksAPI.escapeBlock,
     focusBlock: blocksAPI.focusBlock,
     execHeading2,
-    execHeading3,
     execBlockquote,
     execDivider,
     extractTocItems,
@@ -298,5 +304,6 @@ export function useWriteEditor(
     mergeImageBlocks: blocksAPI.mergeImageBlocks,
     handleColumnsBlockUpload,
     handleStepsBlockUpload,
+    handleImageDropOnEditor,
   };
 }

@@ -45,7 +45,9 @@ function ItemsEditor({ items, color, side, onChange }: {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, idx: number) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      const currentText = e.currentTarget.textContent ?? '';
       const next = [...items];
+      next[idx] = { text: currentText };
       next.splice(idx + 1, 0, { text: '' });
       onChange(next);
       setTimeout(() => refs.current[idx + 1]?.focus(), 0);
@@ -68,12 +70,15 @@ function ItemsEditor({ items, color, side, onChange }: {
 
   useEffect(() => {
     refs.current.forEach((el, i) => {
-      if (el && el.textContent !== items[i]?.text) {
-        el.textContent = items[i]?.text ?? '';
+      if (!el || items[i] === undefined) return;
+      if (items[i].text === '' && el.textContent !== '') {
+        el.textContent = '';
+      }
+      if (items[i].text !== '' && el !== document.activeElement && el.textContent !== items[i].text) {
+        el.textContent = items[i].text;
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items.length]);
+  }, [items]);
 
   return (
     <ul className="space-y-1 mt-2 list-none p-0">
@@ -87,7 +92,6 @@ function ItemsEditor({ items, color, side, onChange }: {
             onKeyDown={(e) => handleKeyDown(e, i)}
             onBlur={(e) => handleBlur(i, e.currentTarget.textContent ?? '')}
             className="flex-1 text-[13px] text-[#374151] focus:outline-none min-h-[20px] leading-snug"
-            dangerouslySetInnerHTML={{ __html: item.text }}
           />
         </li>
       ))}

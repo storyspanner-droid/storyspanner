@@ -52,8 +52,8 @@ body {
   display: block;
 }
 .post-content h1 { font-size: 1.5rem; font-weight: 800; margin: 16px 0 8px; color: #111111; }
-.post-content h2, .write-editor h2 { font-size: 20px; font-weight: 700; margin: 24px 0 8px; color: #111111; padding-bottom: 6px; border-bottom: 2px solid #6C3FC5; }
-.post-content h3, .write-editor h3 { font-size: 17px; font-weight: 600; margin: 18px 0 6px; color: #4B5563; }
+.write-editor h2 { font-size: 20px; font-weight: 700; margin: 24px 0 8px; color: #111111; padding-bottom: 6px; border-bottom: 2px solid #6C3FC5; }
+.post-content h2 { font-size: 18px; font-weight: 700; margin: 20px 0 8px; color: #111111; padding-bottom: 0; border-bottom: none; }
 .post-content hr { border: none; border-top: 2px solid #E5E7EB; margin: 20px 0; }
 .post-content pre {
   background: #F3F4F6;

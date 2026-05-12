@@ -18,6 +18,8 @@ import InfoCardBlock from './blocks/InfoCardBlock';
 import StepsBlock from './blocks/StepsBlock';
 import { useFloatingToolbar } from '../hooks/useFloatingToolbar';
 import { extractTocFromBlocks } from '../hooks/useBlocks';
+import { useEditorResize } from '../hooks/useEditorResize';
+import { usePlusButton } from '../hooks/usePlusButton';
 import { EditorBlock, CalloutEditorBlock, TimelineEditorBlock, TocEditorBlock, DividerEditorBlock, ImageEditorBlock, TableEditorBlock, ColumnsEditorBlock, CompareEditorBlock, InfoCardEditorBlock, StepsEditorBlock, BlockType } from '../types';
 import type { WriteEditorAPI } from '../hooks/useWriteEditor';
 
@@ -49,6 +51,10 @@ export default function WriteEditor({
   const { blocks, updateBlock, addBlockAfter, removeBlock, registerRef, saveSelection, escapeBlock, mergeImageBlocks } = api;
   const dragIndexRef = useRef<number | null>(null);
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+  const [fileDragOver, setFileDragOver] = useState(false);
+  const [fileDragOverIdx, setFileDragOverIdx] = useState<number | null>(null);
+  const { editorHeight, isResizing, handleResizeStart } = useEditorResize();
+  const { plusButtonTop, activeBlockId, setActiveBlockId, updatePosition } = usePlusButton();
 
   const tocFromBlocks = extractTocFromBlocks(blocks);
 
@@ -83,14 +89,40 @@ export default function WriteEditor({
             onLink={onLinkModal} onCode={onCodeModal} onImage={api.triggerImageInsert}
             onYouTube={onYouTubeModal} onFocusMode={onFocusMode} onSpellCheck={onSpellCheck}
             onSplitView={onSplitView} onDraftList={onDraftList}
-            onHeading2={api.execHeading2} onHeading3={api.execHeading3}
+            onHeading2={api.execHeading2}
             onBlockquote={api.execBlockquote} onDivider={api.execDivider}
             isFocusMode={isFocusMode} spellCheckEnabled={spellCheckEnabled} isSplitView={isSplitView}
             onSaveSelection={saveSelection}
           />
         </div>
 
-        <div ref={api.editorContainerRef} className="write-editor flex-1 overflow-y-auto px-10 py-6 relative" style={{ minHeight: isFocusMode ? 'calc(100vh - 60px)' : 540, lineHeight: '1.8', backgroundColor: hasError ? '#FFF5F5' : '#fff' }}>
+        <div
+          ref={api.editorContainerRef}
+          className="write-editor overflow-y-auto px-10 pt-6 pb-32 relative"
+          style={{ height: isFocusMode ? 'calc(100vh - 60px)' : editorHeight, lineHeight: '1.8', backgroundColor: hasError ? '#FFF5F5' : '#fff', userSelect: isResizing ? 'none' : undefined }}
+          onKeyDown={() => requestAnimationFrame(() => updatePosition(api.editorContainerRef.current))}
+          onKeyUp={() => requestAnimationFrame(() => updatePosition(api.editorContainerRef.current))}
+          onClick={() => requestAnimationFrame(() => updatePosition(api.editorContainerRef.current))}
+          onDragEnter={(e) => { if (e.dataTransfer.types.includes('Files')) setFileDragOver(true); }}
+          onDragLeave={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+              setFileDragOver(false);
+              setFileDragOverIdx(null);
+            }
+          }}
+          onDrop={(e) => {
+            if (e.dataTransfer.files.length > 0 && fileDragOverIdx !== null) {
+              e.preventDefault();
+              setFileDragOver(false);
+              setFileDragOverIdx(null);
+              const file = e.dataTransfer.files[0];
+              if (file?.type.startsWith('image/')) {
+                const targetBlockId = blocks[fileDragOverIdx]?.id;
+                if (targetBlockId) api.handleImageDropOnEditor(file, targetBlockId);
+              }
+            }
+          }}
+        >
           {floatPos && (
             <FloatingToolbar pos={floatPos}
               onBold={() => execCmd('bold')} onItalic={() => execCmd('italic')} onUnderline={() => execCmd('underline')}
@@ -103,10 +135,33 @@ export default function WriteEditor({
               key={block.id}
               onInput={onInput}
               draggable
+              onFocusCapture={() => setActiveBlockId(block.id)}
+              onClickCapture={(e) => {
+                setActiveBlockId(block.id);
+                const target = e.currentTarget;
+                requestAnimationFrame(() => updatePosition(api.editorContainerRef.current, target));
+              }}
               onDragStart={() => { dragIndexRef.current = idx; setDraggingIdx(idx); }}
-              onDragOver={(e) => e.preventDefault()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.types.includes('Files')) {
+                  e.dataTransfer.dropEffect = 'copy';
+                  setFileDragOverIdx(idx);
+                }
+              }}
               onDrop={(e) => {
                 e.preventDefault();
+                if (e.dataTransfer.files.length > 0) {
+                  dragIndexRef.current = null;
+                  setDraggingIdx(null);
+                  setFileDragOver(false);
+                  setFileDragOverIdx(null);
+                  const file = e.dataTransfer.files[0];
+                  if (file?.type.startsWith('image/')) {
+                    api.handleImageDropOnEditor(file, block.id);
+                  }
+                  return;
+                }
                 if (dragIndexRef.current !== null && dragIndexRef.current !== idx) {
                   api.moveBlockByIndex(dragIndexRef.current, idx);
                 }
@@ -136,14 +191,41 @@ export default function WriteEditor({
                 onAddBlock={handleBlockAdd}
                 tocFromBlocks={tocFromBlocks}
               />
-              <BlockAdder blockId={block.id} onAdd={handleBlockAdd} />
+              {fileDragOver && fileDragOverIdx === idx && (
+                <div className="absolute -bottom-[2px] left-0 right-0 z-30 pointer-events-none flex items-center" style={{ height: '4px' }}>
+                  <div className="w-full h-[2px] bg-[#6C3FC5] rounded-full" />
+                  <div className="absolute left-0 w-[3px] h-[16px] bg-[#6C3FC5] rounded-full -top-[7px]" />
+                  <div className="absolute right-0 w-[3px] h-[16px] bg-[#6C3FC5] rounded-full -top-[7px]" />
+                </div>
+              )}
             </div>
           ))}
+
+          {/* 커서 위치 추적 플로팅 + 버튼 */}
+          {plusButtonTop !== null && activeBlockId && (
+            <div
+              className="absolute pointer-events-none"
+              style={{ top: plusButtonTop, left: 8, transition: 'top 0.1s ease', zIndex: 20 }}
+            >
+              <div className="pointer-events-auto">
+                <BlockAdder blockId={activeBlockId} onAdd={handleBlockAdd} floating />
+              </div>
+            </div>
+          )}
 
           <span className="absolute bottom-2 right-4 text-[11px] text-[#9CA3AF] pointer-events-none select-none">
             {charCount.total}자 (공백 제외 {charCount.noSpace}자)
           </span>
         </div>
+
+        {!isFocusMode && (
+          <div
+            onMouseDown={handleResizeStart}
+            className="w-full h-[6px] cursor-ns-resize bg-[#E5E7EB] hover:bg-[#6C3FC5] transition-colors rounded-b-[12px] flex items-center justify-center"
+          >
+            <span className="text-[#9CA3AF] text-[12px] leading-none select-none">···</span>
+          </div>
+        )}
       </div>
 
       <input ref={api.imageInputRef} type="file" accept="image/*" multiple className="hidden"
