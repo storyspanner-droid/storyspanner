@@ -1,7 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Timestamp } from 'firebase/firestore';
 import { Post } from '@/lib/types';
 import { CategoryBadge } from '@/components/ui/Badge';
+import { saveScrollY } from '../hooks/useScrollRestore';
 
 function formatDate(ts: Timestamp | null): string {
   if (!ts) return '';
@@ -17,20 +21,27 @@ function formatDate(ts: Timestamp | null): string {
 }
 
 export default function PostCard({ post }: { post: Post }) {
+  const router = useRouter();
   const tags = post.hashtags?.slice(0, 3) ?? [];
 
+  function handleCardClick() {
+    saveScrollY();
+    router.push(`/posts/${post.id}`);
+  }
+
   return (
-    <div className="flex items-start gap-3 py-3.5 px-3 -mx-3 rounded-[10px] hover:bg-white transition-colors group">
+    <div
+      className="flex items-start gap-3 py-3.5 px-3 -mx-3 rounded-[10px] hover:bg-white transition-colors group cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="shrink-0 pt-0.5">
         <CategoryBadge category={post.category} />
       </div>
 
       <div className="flex-1 min-w-0">
-        <Link href={`/posts/${post.id}`} className="block">
-          <p className="text-[14px] font-medium text-[#111111] truncate group-hover:text-gray-700 leading-snug">
-            {post.title}
-          </p>
-        </Link>
+        <p className="text-[14px] font-medium text-[#111111] truncate group-hover:text-gray-700 leading-snug">
+          {post.title}
+        </p>
         <div className="flex items-center gap-2.5 mt-1 text-[12px] text-[#6B7280]">
           <span>{post.nickname}</span>
           <span className="text-[#E5E7EB]">·</span>
@@ -56,6 +67,7 @@ export default function PostCard({ post }: { post: Post }) {
               <Link
                 key={tag}
                 href={`/search?tag=${encodeURIComponent(tag)}`}
+                onClick={(e) => e.stopPropagation()}
                 className="text-[11px] text-[#6C3FC5] bg-[#F3EEFF] px-2 py-0.5 rounded-full cursor-pointer hover:bg-[#E8D9FF] transition-colors"
               >
                 #{tag}
@@ -66,14 +78,14 @@ export default function PostCard({ post }: { post: Post }) {
       </div>
 
       {post.thumbnailUrl && (
-        <Link href={`/posts/${post.id}`} className="w-[56px] h-[56px] rounded-[8px] overflow-hidden shrink-0">
+        <div className="w-[56px] h-[56px] rounded-[8px] overflow-hidden shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={post.thumbnailUrl}
             alt={post.title}
             className="w-full h-full object-cover"
           />
-        </Link>
+        </div>
       )}
     </div>
   );

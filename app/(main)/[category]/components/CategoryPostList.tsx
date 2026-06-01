@@ -1,12 +1,15 @@
-import { Post } from '@/lib/types';
+import { Post, Category } from '@/lib/types';
 import CategoryPostCard from './CategoryPostCard';
-import AdBanner from '../../components/AdBanner';
+import CategoryAdBanner from './CategoryAdBanner';
+
+const AD_SLOTS: Record<number, 1 | 2 | 3> = { 2: 1, 5: 2, 8: 3 };
 
 interface Props {
   posts: Post[];
+  category: Category;
 }
 
-export default function CategoryPostList({ posts }: Props) {
+export default function CategoryPostList({ posts, category }: Props) {
   if (posts.length === 0) {
     return (
       <div className="text-center py-16">
@@ -21,9 +24,9 @@ export default function CategoryPostList({ posts }: Props) {
       {posts.map((post, i) => (
         <div key={post.id}>
           <CategoryPostCard post={post} />
-          {(i + 1) % 3 === 0 && i !== posts.length - 1 && (
+          {AD_SLOTS[i] && (
             <div className="mt-2.5">
-              <AdBanner />
+              <CategoryAdBanner category={category} slot={AD_SLOTS[i]} />
             </div>
           )}
         </div>

@@ -1,19 +1,12 @@
-import Link from 'next/link';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { Timestamp } from 'firebase/firestore';
-import { Post, Category } from '@/lib/types';
+import { Post } from '@/lib/types';
+import { saveScrollY } from '../../hooks/useScrollRestore';
+import { CATEGORY_EMOJI } from '@/lib/constants/categories';
 
-// 피그마 아바타 색상 순환
 const AVATAR_COLORS = ['#6C3FC5', '#7C3AED', '#8B5CF6', '#6D28D9', '#5B21B6'];
-
-const CAT_EMOJI: Record<Category, string> = {
-  '게임':       '🎮',
-  '의료정보':   '🏥',
-  '인테리어DIY': '🏠',
-  '비즈니스':   '💼',
-  '코인/투자':  '💰',
-  '마케팅':     '📣',
-  '공지사항':   '📢',
-};
 
 function timeAgo(ts: Timestamp): string {
   const diff = Date.now() - ts.toMillis();
@@ -42,14 +35,20 @@ interface Props {
 }
 
 export default function CategoryPostCard({ post }: Props) {
+  const router = useRouter();
   const isHot = post.likeCount > 10 || post.views > 200;
   const isNew = Date.now() - post.createdAt.toMillis() < 86_400_000;
   const preview = stripHtml(post.content);
 
+  function handleCardClick() {
+    saveScrollY();
+    router.push(`/posts/${post.id}`);
+  }
+
   return (
-    <Link
-      href={`/posts/${post.id}`}
-      className="flex items-start gap-3.5 p-4 bg-white border border-[#E5E7EB] rounded-[12px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-[#D1D5DB] group"
+    <div
+      onClick={handleCardClick}
+      className="flex items-start gap-3.5 p-4 bg-white border border-[#E5E7EB] rounded-[12px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-[#D1D5DB] group cursor-pointer"
     >
       {/* 아바타 */}
       <div
@@ -107,9 +106,9 @@ export default function CategoryPostCard({ post }: Props) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="text-[22px] select-none">{CAT_EMOJI[post.category] ?? '📄'}</span>
+          <span className="text-[22px] select-none">{CATEGORY_EMOJI[post.category] ?? '📄'}</span>
         )}
       </div>
-    </Link>
+    </div>
   );
 }

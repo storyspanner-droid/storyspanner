@@ -19,7 +19,7 @@ export function useCategoryPosts(category: Category) {
   useEffect(() => {
     setLoading(true);
     getPostsByCategory(category, 200)
-      .then(setAllPosts)
+      .then((posts) => setAllPosts(posts.filter((p) => p.status === 'approved')))
       .catch(() => setAllPosts([]))
       .finally(() => setLoading(false));
   }, [category]);

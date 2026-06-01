@@ -10,9 +10,15 @@ type SortType = (typeof SORT_OPTIONS)[number];
 
 export function useSearchPosts() {
   const searchParams = useSearchParams();
-  const keyword = searchParams.get('q') ?? '';
-  const tagParam = searchParams.get('tag') ?? '';
-  const isTagSearch = !!tagParam && !keyword;
+  const rawKeyword = searchParams.get('q') ?? '';
+  const tagParam   = searchParams.get('tag') ?? '';
+
+  // ?q=#태그 형태도 태그 검색으로 처리
+  const isHashKeyword  = rawKeyword.startsWith('#');
+  const tagFromKeyword = isHashKeyword ? rawKeyword.slice(1) : '';
+  const effectiveTag     = tagParam || tagFromKeyword;   // 최종 태그명
+  const effectiveKeyword = isHashKeyword ? '' : rawKeyword; // 최종 일반 키워드
+  const isTagSearch = !!effectiveTag;
 
   const [allResults, setAllResults] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -22,22 +28,22 @@ export function useSearchPosts() {
   useEffect(() => {
     setCategoryFilter('전체');
 
-    if (isTagSearch) {
+    if (effectiveTag) {
       setLoading(true);
-      searchPostsByTag(tagParam)
+      searchPostsByTag(effectiveTag)
         .then(setAllResults)
         .catch(() => setAllResults([]))
         .finally(() => setLoading(false));
-    } else if (keyword.trim()) {
+    } else if (effectiveKeyword.trim()) {
       setLoading(true);
-      searchPosts(keyword)
+      searchPosts(effectiveKeyword)
         .then(setAllResults)
         .catch(() => setAllResults([]))
         .finally(() => setLoading(false));
     } else {
       setAllResults([]);
     }
-  }, [keyword, tagParam, isTagSearch]);
+  }, [effectiveTag, effectiveKeyword]);
 
   const filtered = useMemo(() => {
     let posts = categoryFilter === '전체' ? allResults : allResults.filter((p) => p.category === categoryFilter);
@@ -53,8 +59,9 @@ export function useSearchPosts() {
   }, [allResults]);
 
   return {
-    keyword,
+    keyword: effectiveKeyword, // 하이라이트용 (# 제거된 일반 키워드)
     tagParam,
+    effectiveTag,              // 태그 검색 시 실제 태그명 (#롤 → 롤)
     isTagSearch,
     loading,
     filtered,

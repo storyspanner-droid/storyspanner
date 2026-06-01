@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePostDetail } from '../hooks/usePostDetail';
 import { useComments } from '../hooks/useComments';
+import { useEngagement } from '../hooks/useEngagement';
 import { PageLoading } from '@/components/ui/Loading';
 import PostBody from './PostBody';
+import { LABEL_TO_SLUG } from '@/lib/constants/categories';
 import PostActions from './PostActions';
 import CommentList from './CommentList';
 import CommentForm from './CommentForm';
@@ -14,12 +16,13 @@ import TableOfContents from './TableOfContents';
 
 export default function PostDetail({ postId }: { postId: string }) {
   const router = useRouter();
-  const { post, loading, notFound, handleDelete } = usePostDetail(postId);
+  const { user } = useAuth();
+  const { post, loading, notFound, handleDelete } = usePostDetail(postId, user?.id ?? null);
+  useEngagement(postId);
   const {
     comments, loading: commentsLoading, submitting,
     replyTo, setReplyTo, submitComment, removeComment,
   } = useComments(postId);
-  const { user } = useAuth();
 
   if (loading) return <PageLoading />;
 
@@ -35,7 +38,7 @@ export default function PostDetail({ postId }: { postId: string }) {
   }
 
   const isOwner = user?.id === post.userId;
-  const categoryHref = post.category === '코인/투자' ? '/코인투자' : `/${post.category}`;
+  const categoryHref = `/${LABEL_TO_SLUG[post.category] ?? post.category}`;
 
   return (
     <div className="max-w-[1180px] mx-auto px-4 py-8 flex gap-6 items-start">

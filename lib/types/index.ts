@@ -12,13 +12,16 @@ export interface TocItem {
 // ─── 공통 ──────────────────────────────────────────────────────────────────
 
 export type Category =
-  | '게임'
-  | '의료정보'
-  | '인테리어DIY'
-  | '비즈니스'
-  | '코인/투자'
-  | '마케팅'
-  | '공지사항';
+  | '맛집 / 리뷰'
+  | '생활 / 지역 정보'
+  | '의료 / 건강'
+  | '인테리어 / DIY'
+  | '금융 / 법률'
+  | '라이프스타일'
+  | '교육 / 육아'
+  | '여행 / 문화'
+  | '자동차 / 모빌리티'
+  | '뷰티 / 패션';
 
 export type UserLevel = 1 | 2 | 3 | 4 | 5;
 // 1: 일반회원 | 2: 활동회원 | 3: 우수회원 | 4: 운영회원 | 5: 관리자
@@ -89,7 +92,7 @@ export interface Post {
   userId: string;
   nickname: string;
   status: PostStatus;      // 기본값 'approved'
-  views: number;           // 기본값 0
+  views: number;           // 표시용 조회수 (중복 포함), 기본값 0
   likeCount: number;       // 기본값 0
   commentCount: number;    // 기본값 0
   hashtags: string[];      // 기본값 []
@@ -98,6 +101,13 @@ export interface Post {
   tableOfContents?: TocItem[];  // 목차 항목 목록 (선택)
   poll?: Poll;
   aiScore?: AIScore;       // 관리자 전용
+  // ─── 점수 관련 ──────────────────────────────────────────────
+  score?: number;           // 최종 인기 점수
+  scoreUpdatedAt?: Timestamp; // 점수 마지막 업데이트 시각
+  rawViews?: number;        // 중복 제거된 실 조회수 (점수 계산용)
+  uniqueViewers?: string[]; // 중복 방지용 UID/익명ID 목록 (최대 1000)
+  avgScrollDepth?: number;  // 평균 스크롤 깊이 (0~100)
+  avgDwellSec?: number;     // 평균 체류시간 (초)
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -215,18 +225,35 @@ export interface Notification {
 
 // ─── Ad ────────────────────────────────────────────────────────────────────
 
-export type AdPosition = 'list' | 'sidebar' | 'top' | 'bottom';
+export type AdStatus = 'pending' | 'approved' | 'rejected' | 'paused';
 
 export interface Ad {
   id: string;
+  advertiserId: string;
+  advertiserNickname: string;
+  category: Category;
   title: string;
+  description?: string;
   imageUrl: string;
   linkUrl: string;
-  position: AdPosition;
-  startDate: Timestamp;
-  endDate: Timestamp;
-  active: boolean;
+  bidPrice: number;
+  actualPrice?: number;
+  status: AdStatus;
+  rank?: number;
+  credits: number;
+  clicks: number;
+  impressions: number;
   createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface AdClick {
+  id: string;
+  adId: string;
+  userId?: string | null;
+  dedupKey: string;
+  clickedAt: Timestamp;
+  creditCharged: number;
 }
 
 // ─── SearchLog (인기 검색어) ────────────────────────────────────────────────

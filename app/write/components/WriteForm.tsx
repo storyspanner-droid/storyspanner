@@ -111,7 +111,7 @@ export default function WriteForm() {
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
         <div className="bg-white border border-[#E5E7EB] rounded-[16px] px-7 py-7 flex flex-col gap-5">
-          <WriteCategoryPicker value={form.category} onChange={(cat) => setField('category', cat)} error={errors.category} userLevel={user?.level} />
+          <WriteCategoryPicker value={form.category} onChange={(cat) => setField('category', cat)} error={errors.category} />
 
           <div className="flex gap-4 items-start">
             <div className="flex-1">

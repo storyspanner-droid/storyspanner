@@ -1,12 +1,14 @@
 'use client';
 
 import { useLatestPosts } from '../hooks/useLatestPosts';
+import { useScrollRestore } from '../hooks/useScrollRestore';
 import PostCard from './PostCard';
 import AdBanner from './AdBanner';
 import { ListSkeleton } from '@/components/ui/Loading';
 
 export default function PostList() {
   const { posts, loading } = useLatestPosts();
+  useScrollRestore();
 
   return (
     <section className="bg-white rounded-[16px] border border-[#E5E7EB] px-5 py-4">

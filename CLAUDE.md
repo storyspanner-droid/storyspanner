@@ -245,7 +245,21 @@ users / posts / comments / likes / reports / notifications / ads
 
 ## 카테고리 목록
 
-게임 | 의료정보 | 인테리어DIY | 비즈니스 | 코인/투자 | 마케팅 | 공지사항
+10개 대분류. 상수는 `lib/constants/categories.ts`의 `CATEGORY_LIST`에서 중앙 관리.
+컴포넌트/페이지에 카테고리 목록 직접 하드코딩 금지.
+
+| ID (URL slug)   | Label (Firestore 저장값) | Emoji |
+|-----------------|--------------------------|-------|
+| food-review     | 맛집 / 리뷰              | 🍽️   |
+| life-local      | 생활 / 지역 정보          | 🏘️   |
+| health          | 의료 / 건강              | 🏥   |
+| interior-diy    | 인테리어 / DIY           | 🛠️   |
+| finance-law     | 금융 / 법률              | ⚖️   |
+| lifestyle       | 라이프스타일             | ✨   |
+| education       | 교육 / 육아              | 📚   |
+| travel-culture  | 여행 / 문화              | ✈️   |
+| auto            | 자동차 / 모빌리티         | 🚗   |
+| beauty-fashion  | 뷰티 / 패션              | 💄   |
 
 ---
 

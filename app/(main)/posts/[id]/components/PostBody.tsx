@@ -70,7 +70,6 @@ export default function PostBody({ post, isOwner }: Props) {
         onCopy: (e: React.ClipboardEvent) => e.preventDefault(),
         onCut: (e: React.ClipboardEvent) => e.preventDefault(),
         onDragStart: (e: React.DragEvent) => e.preventDefault(),
-        onSelectStart: (e: React.SyntheticEvent) => e.preventDefault(),
         onKeyDown: (e: React.KeyboardEvent) => {
           const ctrl = e.ctrlKey || e.metaKey;
           if (ctrl && ['c', 'C', 'a', 'A', 'v', 'V', 'x', 'X'].includes(e.key)) {

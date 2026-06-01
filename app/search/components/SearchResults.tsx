@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { useSearchPosts } from '../hooks/useSearchPosts';
 import { Category } from '@/lib/types';
+import { CATEGORY_EMOJI } from '@/lib/constants/categories';
 
 function highlight(text: string, keyword: string): React.ReactNode {
   if (!keyword.trim()) return text;
@@ -22,16 +23,11 @@ function formatDate(ts: Timestamp): string {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
 
-const CATEGORY_EMOJI: Record<Category, string> = {
-  '게임': '🎮', '의료정보': '🏥', '인테리어DIY': '🛠️',
-  '비즈니스': '💼', '코인/투자': '💰', '마케팅': '📢', '공지사항': '📣',
-};
-
 export default function SearchResults() {
   const router = useRouter();
   const [inputVal, setInputVal] = useState('');
   const {
-    keyword, tagParam, isTagSearch,
+    keyword, tagParam, effectiveTag, isTagSearch,
     loading, filtered, categoryFilter, setCategoryFilter,
     sort, setSort, SORT_OPTIONS, categoryGroups, totalCount,
   } = useSearchPosts();
@@ -54,7 +50,7 @@ export default function SearchResults() {
       <form onSubmit={handleSearch} className="flex gap-2">
         <input
           type="text"
-          defaultValue={isTagSearch ? `#${tagParam}` : keyword}
+          defaultValue={isTagSearch ? `#${effectiveTag}` : keyword}
           onChange={(e) => setInputVal(e.target.value)}
           placeholder="검색어 또는 #태그로 검색하세요"
           className="flex-1 h-[48px] px-4 border-2 border-[#6C3FC5] rounded-[12px] text-[14px] placeholder-[#9CA3AF] focus:outline-none"
@@ -70,7 +66,7 @@ export default function SearchResults() {
           <p className="text-[14px] text-[#4B5563]">
             {isTagSearch ? (
               <>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[13px] font-bold bg-[#F3EEFF] text-[#6C3FC5] mr-1">#{tagParam}</span>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[13px] font-bold bg-[#F3EEFF] text-[#6C3FC5] mr-1">#{effectiveTag}</span>
                 태그 게시글{' '}
                 <span className="text-[#6C3FC5] font-bold">{totalCount}개</span>
               </>
@@ -172,7 +168,7 @@ export default function SearchResults() {
                               key={tag}
                               onClick={(e) => { e.preventDefault(); router.push(`/search?tag=${encodeURIComponent(tag)}`); }}
                               className={`text-[11px] px-2 py-0.5 rounded-full cursor-pointer transition-colors ${
-                                tag === tagParam
+                                tag === effectiveTag
                                   ? 'bg-[#6C3FC5] text-white'
                                   : 'bg-[#F3EEFF] text-[#6C3FC5] hover:bg-[#E8D9FF]'
                               }`}

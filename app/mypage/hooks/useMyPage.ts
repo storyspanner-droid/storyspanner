@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { signOut } from '@/lib/services/authService';
 
-export type MyPageTab = 'dashboard' | 'posts' | 'likes' | 'friends' | 'stats' | 'settings' | 'withdraw';
+export type MyPageTab = 'dashboard' | 'posts' | 'likes' | 'friends' | 'stats' | 'myads' | 'settings' | 'withdraw';
 
 export function useMyPage() {
   const { user } = useAuth();

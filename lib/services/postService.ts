@@ -7,8 +7,8 @@ import db from '@/lib/firebase/firestore';
 import { Post, Category, TocItem } from '@/lib/types';
 import { incrementUserStat } from './userService';
 
-// 읽기 시 누락 필드에 기본값 보장
-function normalizePost(id: string, data: DocumentData): Post {
+// 읽기 시 누락 필드에 기본값 보장 (scoreService에서도 사용하므로 export)
+export function normalizePost(id: string, data: DocumentData): Post {
   return {
     ...data,
     id,
@@ -20,6 +20,10 @@ function normalizePost(id: string, data: DocumentData): Post {
     thumbnailUrl: data.thumbnailUrl ?? '',
     status: data.status ?? 'approved',
     tableOfContents: data.tableOfContents ?? [],
+    score: data.score ?? 0,
+    rawViews: data.rawViews ?? 0,
+    avgScrollDepth: data.avgScrollDepth ?? 0,
+    avgDwellSec: data.avgDwellSec ?? 0,
   } as Post;
 }
 
@@ -157,13 +161,29 @@ export async function searchPostsByTag(tagName: string): Promise<Post[]> {
     const q = query(
       collection(db, 'posts'),
       where('hashtags', 'array-contains', tagName),
-      orderBy('createdAt', 'desc'),
       limit(100),
     );
     const snap = await getDocs(q);
-    return snap.docs.map((d) => normalizePost(d.id, d.data()));
-  } catch {
+    const posts = snap.docs.map((d) => normalizePost(d.id, d.data()));
+    return posts.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+  } catch (error) {
+    console.error('searchPostsByTag error:', error);
     return [];
+  }
+}
+
+export async function getPostCountByCategory(category: Category): Promise<number> {
+  try {
+    const q = query(
+      collection(db, 'posts'),
+      where('category', '==', category),
+      where('status', '==', 'approved'),
+    );
+    const snap = await getDocs(q);
+    return snap.size;
+  } catch (error) {
+    console.error('getPostCountByCategory error:', error);
+    return 0;
   }
 }
 

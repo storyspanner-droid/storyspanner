@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getPostById, incrementPostViews, deletePost } from '@/lib/services/postService';
+import { getPostById, deletePost } from '@/lib/services/postService';
+import { recordView } from '@/lib/services/scoreService';
 import { Post } from '@/lib/types';
 
-export function usePostDetail(postId: string) {
+export function usePostDetail(postId: string, uid: string | null = null) {
   const router = useRouter();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,11 +18,11 @@ export function usePostDetail(postId: string) {
       .then((p) => {
         if (!p) { setNotFound(true); return; }
         setPost(p);
-        incrementPostViews(postId).catch(() => {});
+        recordView(postId, uid).catch(() => {});
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-  }, [postId]);
+  }, [postId, uid]);
 
   const handleDelete = async () => {
     if (!post) return;

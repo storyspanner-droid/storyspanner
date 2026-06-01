@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import { CalloutEditorBlock, CalloutType } from '../../types';
 
 const TYPES: { type: CalloutType; icon: string; label: string; bg: string; border: string }[] = [
@@ -18,6 +19,14 @@ interface Props {
 
 export default function CalloutBlock({ block, onChange, onRemove, onEscape }: Props) {
   const current = TYPES.find((t) => t.type === block.calloutType) ?? TYPES[0];
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.innerHTML = block.content;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div
@@ -44,11 +53,18 @@ export default function CalloutBlock({ block, onChange, onRemove, onEscape }: Pr
           ))}
         </div>
         <div
+          ref={contentRef}
           contentEditable
           suppressContentEditableWarning
-          onInput={(e) => onChange(block.id, { content: e.currentTarget.innerHTML })}
-          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onEscape?.(block.id); } }}
-          dangerouslySetInnerHTML={{ __html: block.content }}
+          onBlur={(e) => onChange(block.id, { content: e.currentTarget.innerHTML })}
+          onCompositionEnd={(e) => onChange(block.id, { content: e.currentTarget.innerHTML })}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              onChange(block.id, { content: contentRef.current?.innerHTML ?? '' });
+              onEscape?.(block.id);
+            }
+          }}
           className="focus:outline-none text-[14px] text-[#111111] leading-[1.8] min-h-[24px] empty:before:content-['내용을_입력하세요...'] empty:before:text-[#9CA3AF] empty:before:pointer-events-none"
         />
       </div>

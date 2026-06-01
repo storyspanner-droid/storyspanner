@@ -4,25 +4,12 @@ import Link from 'next/link';
 import { useHeader } from '@/lib/hooks/useHeader';
 import { useNotifications } from '@/lib/hooks/useNotifications';
 import NotificationPopup from './NotificationPopup';
-import { Category } from '@/lib/types';
+import { CATEGORY_LIST } from '@/lib/constants/categories';
 
-const CATEGORIES: Category[] = [
-  '게임', '의료정보', '인테리어DIY', '비즈니스', '코인/투자', '마케팅', '공지사항',
-];
-
-const CAT_PATH: Record<Category, string> = {
-  '게임':       '/게임',
-  '의료정보':   '/의료정보',
-  '인테리어DIY': '/인테리어DIY',
-  '비즈니스':   '/비즈니스',
-  '코인/투자':  '/코인투자',
-  '마케팅':     '/마케팅',
-  '공지사항':   '/공지사항',
-};
 
 const ALL_NAV = [
   { label: '전체', href: '/' },
-  ...CATEGORIES.map((cat) => ({ label: cat, href: CAT_PATH[cat] })),
+  ...CATEGORY_LIST.map((cat) => ({ label: cat.label, href: `/${cat.id}` })),
 ];
 
 function isActive(pathname: string, href: string): boolean {

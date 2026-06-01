@@ -3,10 +3,7 @@
 import Link from 'next/link';
 import { useRegister } from '../hooks/useRegister';
 import { Category } from '@/lib/types';
-
-const CATEGORIES: Category[] = [
-  '게임', '의료정보', '인테리어DIY', '비즈니스', '코인/투자', '마케팅', '공지사항',
-];
+import { CATEGORY_LIST } from '@/lib/constants/categories';
 
 const inputCls = (hasError: boolean) =>
   `w-full px-4 py-3.5 border rounded-[10px] text-[14px] placeholder-[#757575] focus:outline-none transition-colors ${
@@ -115,18 +112,18 @@ export default function RegisterForm() {
         <div>
           <p className="text-[12px] text-[#6B7280] mb-2">관심분야 (선택, 복수 가능)</p>
           <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((cat) => (
+            {CATEGORY_LIST.map((cat) => (
               <button
-                key={cat}
+                key={cat.id}
                 type="button"
-                onClick={() => toggleInterest(cat)}
+                onClick={() => toggleInterest(cat.label as Category)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                  form.interests.includes(cat)
+                  form.interests.includes(cat.label as Category)
                     ? 'bg-[#111111] text-white border-[#111111]'
                     : 'bg-white text-[#6B7280] border-[#D1D5DB] hover:border-[#6C3FC5] hover:text-[#6C3FC5]'
                 }`}
               >
-                {cat}
+                {cat.label}
               </button>
             ))}
           </div>

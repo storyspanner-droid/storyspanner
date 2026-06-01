@@ -1,21 +1,16 @@
-import { Category } from '@/lib/types';
+'use client';
 
-const CATEGORY_EMOJI: Record<Category, string> = {
-  '게임':       '🎮',
-  '의료정보':   '🏥',
-  '인테리어DIY': '🛠️',
-  '비즈니스':   '💼',
-  '코인/투자':  '💰',
-  '마케팅':     '📢',
-  '공지사항':   '📣',
-};
+import { Category } from '@/lib/types';
+import { useCategoryCount } from '../hooks/useCategoryCount';
+import { CATEGORY_EMOJI } from '@/lib/constants/categories';
 
 interface Props {
   category: Category;
-  totalCount: number;
 }
 
-export default function CategoryBanner({ category, totalCount }: Props) {
+export default function CategoryBanner({ category }: Props) {
+  const { totalCount } = useCategoryCount(category);
+
   return (
     <div
       className="px-6 py-8 flex items-center justify-between"

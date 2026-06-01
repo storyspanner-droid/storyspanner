@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getHotPosts } from '@/lib/services/postService';
+import { getPopularPosts } from '@/lib/services/scoreService';
 import { Post } from '@/lib/types';
 
 export function useHotPosts() {
@@ -9,7 +9,7 @@ export function useHotPosts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getHotPosts()
+    getPopularPosts(10)
       .then(setPosts)
       .catch(() => setPosts([]))
       .finally(() => setLoading(false));

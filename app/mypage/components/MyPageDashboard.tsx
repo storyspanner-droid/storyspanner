@@ -7,6 +7,7 @@ import { useMyCharts } from '../hooks/useMyCharts';
 import { LevelBadge } from '@/components/ui/Badge';
 import MyPostsList from './MyPostsList';
 import MyCharts from './MyCharts';
+import MyAdsTab from './MyAdsTab';
 
 const NAV_ITEMS: { label: string; tab: MyPageTab; red?: boolean }[] = [
   { label: '대시보드',    tab: 'dashboard' },
@@ -14,6 +15,7 @@ const NAV_ITEMS: { label: string; tab: MyPageTab; red?: boolean }[] = [
   { label: '좋아요한 글', tab: 'likes' },
   { label: '친구 관리',   tab: 'friends' },
   { label: '상세 통계',   tab: 'stats' },
+  { label: '내 광고',     tab: 'myads' },
   { label: '내 정보 수정', tab: 'settings' },
   { label: '회원 탈퇴',   tab: 'withdraw', red: true },
 ];
@@ -175,6 +177,8 @@ export default function MyPageDashboard() {
         )}
 
         {activeTab === 'posts' && <MyPostsList userId={user.id} />}
+
+        {activeTab === 'myads' && <MyAdsTab userId={user.id} nickname={user.nickname} />}
 
         {activeTab === 'likes' && (
           <div className="bg-white border border-[#E5E7EB] rounded-[12px] p-6 text-center py-16">

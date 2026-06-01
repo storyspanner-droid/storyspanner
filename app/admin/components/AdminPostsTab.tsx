@@ -5,15 +5,12 @@ import { Timestamp } from 'firebase/firestore';
 import Modal from '@/components/ui/Modal';
 import { useAdminPosts } from '../hooks/useAdminPosts';
 import { Post, Category, PostStatus } from '@/lib/types';
+import { CATEGORY_LIST } from '@/lib/constants/categories';
 
 const ALL_CATEGORIES: (Category | undefined)[] = [
-  undefined, '게임', '의료정보', '인테리어DIY', '비즈니스', '코인/투자', '마케팅', '공지사항',
+  undefined,
+  ...CATEGORY_LIST.map((c) => c.label as Category),
 ];
-
-const CAT_LABELS: Record<string, string> = {
-  '게임': '게임', '의료정보': '의료정보', '인테리어DIY': '인테리어', '비즈니스': '비즈니스',
-  '코인/투자': '코인', '마케팅': '마케팅', '공지사항': '공지',
-};
 
 const STATUSES: { value: PostStatus; label: string }[] = [
   { value: 'approved', label: '승인됨' },
@@ -38,7 +35,7 @@ export default function AdminPostsTab({ active }: { active: boolean }) {
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
   const { posts, loading, editTarget, setEditTarget, handleUpdate, handleDelete } =
     useAdminPosts(active, selectedCategory);
-  const [form, setForm] = useState<EditForm>({ title: '', category: '게임', status: 'approved' });
+  const [form, setForm] = useState<EditForm>({ title: '', category: '맛집 / 리뷰', status: 'approved' });
 
   const openEdit = (post: Post) => {
     setEditTarget(post);
@@ -68,7 +65,7 @@ export default function AdminPostsTab({ active }: { active: boolean }) {
                   : 'bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]'
               }`}
             >
-              {cat ? (CAT_LABELS[cat] ?? cat) : '전체'}
+              {cat ?? '전체'}
             </button>
           );
         })}

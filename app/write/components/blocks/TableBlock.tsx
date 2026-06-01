@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { TableEditorBlock, TableStyle, CellStyle } from '../../types';
 
 interface Props {
@@ -118,16 +118,36 @@ export default function TableBlock({ block, onChange, onRemove }: Props) {
   const [selected, setSelected] = useState<{ ri: number; ci: number } | null>(null);
   const [colorPopup, setColorPopup] = useState<'cell' | 'row' | 'col' | null>(null);
 
+  // 셀 DOM refs — rows × cols 2D 배열
+  const cellRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
+
   const s = block.tableStyle ?? 'default';
   const colCount = block.rows[0]?.length ?? 3;
   const outerBorder = s === 'default' ? 'border border-[#E5E7EB]' : '';
 
+  // 최초 마운트 시에만 각 셀 innerHTML 설정
+  useEffect(() => {
+    block.rows.forEach((row, ri) => {
+      row.forEach((cell, ci) => {
+        const el = cellRefs.current[ri]?.[ci];
+        if (el) el.innerHTML = cell;
+      });
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const setRows = (rows: string[][]) => onChange(block.id, { rows });
 
-  const updateCell = (ri: number, ci: number, html: string) =>
-    setRows(block.rows.map((r, i) => i === ri ? r.map((c, j) => j === ci ? html : c) : r));
+  const updateCell = useCallback((ri: number, ci: number, html: string) => {
+    onChange(block.id, {
+      rows: block.rows.map((r, i) => i === ri ? r.map((c, j) => j === ci ? html : c) : r),
+    });
+  }, [block.id, block.rows, onChange]);
 
-  const addRow = () => setRows([...block.rows, Array(colCount).fill('')]);
+  const addRow = () => {
+    const newRows = [...block.rows, Array(colCount).fill('')];
+    setRows(newRows);
+  };
   const addCol = () => setRows(block.rows.map((r) => [...r, '']));
   const removeLastRow = () => { if (block.rows.length > 1) setRows(block.rows.slice(0, -1)); };
   const removeLastCol = () => { if (colCount > 1) setRows(block.rows.map((r) => r.slice(0, -1))); };
@@ -262,20 +282,22 @@ export default function TableBlock({ block, onChange, onRemove }: Props) {
           <tbody>
             {block.rows.map((row, ri) => {
               const isH = block.headers && ri === 0;
+              if (!cellRefs.current[ri]) cellRefs.current[ri] = [];
               return (
                 <tr key={ri}>
-                  {row.map((cell, ci) => {
+                  {row.map((_, ci) => {
                     const Tag = isH ? 'th' : 'td';
                     const isSelected = selected?.ri === ri && selected?.ci === ci;
                     return (
                       <Tag
                         key={ci}
+                        ref={(el) => { cellRefs.current[ri][ci] = el; }}
                         contentEditable
                         suppressContentEditableWarning
                         onFocus={() => setSelected({ ri, ci })}
-                        onInput={(e) => updateCell(ri, ci, e.currentTarget.innerHTML)}
-                        dangerouslySetInnerHTML={{ __html: cell }}
-                        className={`${getCellBaseClass(s, ri, isH)} ${isSelected ? 'outline outline-2 outline-[#6C3FC5] outline-offset-[-2px]' : ''}`}
+                        onBlur={(e) => updateCell(ri, ci, e.currentTarget.innerHTML)}
+                        onCompositionEnd={(e) => updateCell(ri, ci, e.currentTarget.innerHTML)}
+                        className={`${getCellBaseClass(s, ri, isH ?? false)} ${isSelected ? 'outline outline-2 outline-[#6C3FC5] outline-offset-[-2px]' : ''}`}
                         style={getCellInlineStyle(block.cellStyles, ri, ci)}
                       />
                     );

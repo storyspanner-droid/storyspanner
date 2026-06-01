@@ -10,6 +10,7 @@ import AdminPostsTab from './AdminPostsTab';
 import AdminUsersTab from './AdminUsersTab';
 import AdminCharts from './AdminCharts';
 import AdminStatsCharts from './AdminStatsCharts';
+import AdminAdManager from './AdminAdManager';
 
 export default function AdminDashboard() {
   const { user, loading, isAdmin, activeTab, setActiveTab } = useAdmin();
@@ -71,8 +72,11 @@ export default function AdminDashboard() {
           </>
         )}
 
-        {/* 공지/광고 탭 */}
-        {(activeTab === 'notices' || activeTab === 'ads') && (
+        {/* 광고 탭 */}
+        {activeTab === 'ads' && <AdminAdManager />}
+
+        {/* 공지 탭 */}
+        {activeTab === 'notices' && (
           <div className="bg-white border border-[#E5E7EB] rounded-[12px] p-5">
             <p className="text-[13px] text-[#9CA3AF] py-10 text-center">준비 중입니다.</p>
           </div>

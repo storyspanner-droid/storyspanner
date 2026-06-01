@@ -4,15 +4,10 @@ import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { PageLoading } from '@/components/ui/Loading';
-import { Category } from '@/lib/types';
+import { CATEGORY_EMOJI } from '@/lib/constants/categories';
 
 const LEVEL_LABELS: Record<number, string> = {
   1: '일반회원', 2: '활동회원', 3: '우수회원', 4: '운영회원', 5: '관리자',
-};
-
-const CATEGORY_EMOJI: Record<Category, string> = {
-  '게임': '🎮', '의료정보': '🏥', '인테리어DIY': '🛠️',
-  '비즈니스': '💼', '코인/투자': '💰', '마케팅': '📢', '공지사항': '📣',
 };
 
 function formatDate(ts: Timestamp): string {
